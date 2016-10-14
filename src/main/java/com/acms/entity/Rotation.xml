@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acms.dao.RotationDao">
+	<resultMap id="BaseResultMap" type="rotation">
+		<id column="rotationid" property="rotationid" jdbcType="INTEGER" />
+		<result column="fontid" property="fontid" jdbcType="INTEGER" />
+		<result column="rank" property="rank" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		rotationid, fontid, rank
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from t_rotation
+		where rotationid = #{rotationid,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_rotation
+		where rotationid = #{rotationid,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="rotation">
+		insert into t_rotation (rotationid, fontid, rank
+		)
+		values (#{rotationid,jdbcType=INTEGER}, #{fontid,jdbcType=INTEGER},
+		#{rank,jdbcType=INTEGER}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="rotation">
+		insert into t_rotation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="rotationid != null">
+				rotationid,
+			</if>
+			<if test="fontid != null">
+				fontid,
+			</if>
+			<if test="rank != null">
+				rank,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="rotationid != null">
+				#{rotationid,jdbcType=INTEGER},
+			</if>
+			<if test="fontid != null">
+				#{fontid,jdbcType=INTEGER},
+			</if>
+			<if test="rank != null">
+				#{rank,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="rotation">
+		update t_rotation
+		<set>
+			<if test="fontid != null">
+				fontid = #{fontid,jdbcType=INTEGER},
+			</if>
+			<if test="rank != null">
+				rank = #{rank,jdbcType=INTEGER},
+			</if>
+		</set>
+		where rotationid = #{rotationid,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="rotation">
+		update t_rotation
+		set fontid = #{fontid,jdbcType=INTEGER},
+		rank = #{rank,jdbcType=INTEGER}
+		where rotationid = #{rotationid,jdbcType=INTEGER}
+	</update>
+	
+	<sql id="wheres">
+		1=1
+		<if test="fontname !=null and fontname !=''">
+			and fontname like
+			CONCAT('%',#{fontname,jdbcType=VARCHAR},'%')
+		</if>
+	</sql>
+	
+	<select id="selectByPaging" resultType="rotation">
+		select r.*,f.fontname,f.fontimg
+		from t_rotation r
+		left join t_font f on f.fontid=r.fontid
+		<where>
+			<include refid="wheres" />
+			<if test="orderName != null and orderType != null">
+				order by ${orderName} ${orderType}
+			</if>
+			<if test="start != null and limit != null">
+				limit #{start},#{limit}
+			</if>
+		</where>
+	</select>
+	
+	<select id="countByPaging" resultType="int">
+		select count(*)
+		from t_rotation r
+		left join t_font f on f.fontid=r.fontid
+	</select>
+	
+	<select id="selectFontByPaging" resultType="font">
+		select * from t_font
+		<where>
+			<include refid="wheres" />
+			and fontid not in (select fontid from t_rotation)
+			<if test="orderName != null and orderType != null">
+				order by ${orderName} ${orderType}
+			</if>
+			<if test="start != null and limit != null">
+				limit #{start},#{limit}
+			</if>
+		</where>
+	</select>
+	
+	<select id="countFontByPaging" resultType="int">
+		select count(*) from t_font
+		<where>
+			<include refid="wheres" />
+			and fontid not in (select fontid from t_rotation)
+		</where>
+	</select>
+	
+	<select id="getRotationCount" resultType="int">
+		select count(*) from t_rotation
+	</select>
+	
+	<select id="getRotationExceptUpd" resultType="rotation" parameterType="rotation">
+		select * from t_rotation
+		where rotationid!=#{rotationid}
+		order by rank asc
+	</select>
+	
+	<update id="updateOrder" parameterType="rotation">
+		update t_rotation
+		set rank=#{rank}
+		where rotationid=#{rotationid}
+	</update>
+	
+	<select id="countByFontid" parameterType="java.lang.Integer" resultType="int">
+		select count(*) from t_rotation
+		where fontid=#{fontid}
+	</select>
+	
+	<select id="selectByFontid" parameterType="java.lang.Integer" resultType="rotation">
+		select * from t_rotation
+		where fontid=#{fontid}
+	</select>
+</mapper>

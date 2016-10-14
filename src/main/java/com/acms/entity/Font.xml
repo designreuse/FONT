@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acms.dao.FontDao">
+	<resultMap id="BaseResultMap" type="font">
+		<id column="fontid" property="fontid" jdbcType="INTEGER" />
+		<result column="fontname" property="fontname" jdbcType="VARCHAR" />
+		<result column="downurl" property="downurl" jdbcType="VARCHAR" />
+		<result column="filesize" property="filesize" jdbcType="VARCHAR" />
+		<result column="userid" property="userid" jdbcType="INTEGER" />
+		<result column="fonttags" property="fonttags" jdbcType="VARCHAR" />
+		<result column="fontdesc" property="fontdesc" jdbcType="VARCHAR" />
+		<result column="fonticon" property="fonticon" jdbcType="VARCHAR" />
+		<result column="fontimg" property="fontimg" jdbcType="VARCHAR" />
+		<result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+		<result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" />
+		<result column="wholerank" property="wholerank" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		f.fontid, f.fontname, f.downurl, f.filesize, f.userid,
+		f.fonttags, f.fontdesc, f.fonticon, f.fontimg,
+		f.createtime,
+		f.updatetime,
+		f.wholerank
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from t_font
+		where fontid = #{fontid,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_font
+		where fontid = #{fontid,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="font">
+		insert into t_font (fontid,
+		fontname, downurl, filesize,
+		userid, fonttags, fontdesc,
+		fonticon,
+		fontimg, createtime,
+		updatetime, wholerank)
+		values
+		(#{fontid,jdbcType=INTEGER}, #{fontname,jdbcType=VARCHAR},
+		#{downurl,jdbcType=VARCHAR},#{filesize,jdbcType=VARCHAR},
+		#{userid,jdbcType=INTEGER}, #{fonttags,jdbcType=VARCHAR},
+		#{fontdesc,jdbcType=VARCHAR},
+		#{fonticon,jdbcType=VARCHAR},
+		#{fontimg,jdbcType=VARCHAR},
+		#{createtime,jdbcType=TIMESTAMP},
+		#{updatetime,jdbcType=TIMESTAMP},
+		#{wholerank,jdbcType=INTEGER})
+	</insert>
+	<insert id="insertSelective" parameterType="font">
+		<selectKey keyProperty="fontid" resultType="java.lang.Integer"
+			order="BEFORE">
+			select nextval('t_font')
+		</selectKey>
+		insert into t_font
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fontid != null">
+				fontid,
+			</if>
+			<if test="fontname != null">
+				fontname,
+			</if>
+			<if test="downurl != null">
+				downurl,
+			</if>
+			<if test="filesize != null">
+				filesize,
+			</if>
+			<if test="userid != null">
+				userid,
+			</if>
+			<if test="fonttags != null">
+				fonttags,
+			</if>
+			<if test="fontdesc != null">
+				fontdesc,
+			</if>
+			<if test="fonticon != null">
+				fonticon,
+			</if>
+			<if test="fontimg != null">
+				fontimg,
+			</if>
+			<if test="createtime != null">
+				createtime,
+			</if>
+			<if test="updatetime != null">
+				updatetime,
+			</if>
+			<if test="wholerank != null">
+				wholerank,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fontid != null">
+				#{fontid,jdbcType=INTEGER},
+			</if>
+			<if test="fontname != null">
+				#{fontname,jdbcType=VARCHAR},
+			</if>
+			<if test="downurl != null">
+				#{downurl,jdbcType=VARCHAR},
+			</if>
+			<if test="filesize != null">
+				#{filesize,jdbcType=VARCHAR},
+			</if>
+			<if test="userid != null">
+				#{userid,jdbcType=INTEGER},
+			</if>
+			<if test="fonttags != null">
+				#{fonttags,jdbcType=VARCHAR},
+			</if>
+			<if test="fontdesc != null">
+				#{fontdesc,jdbcType=VARCHAR},
+			</if>
+			<if test="fonticon != null">
+				#{fonticon,jdbcType=VARCHAR},
+			</if>
+			<if test="fontimg != null">
+				#{fontimg,jdbcType=VARCHAR},
+			</if>
+			<if test="createtime != null">
+				#{createtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatetime != null">
+				#{updatetime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="wholerank != null">
+				#{wholerank,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="font">
+		update t_font
+		<set>
+			<if test="fontname != null">
+				fontname = #{fontname,jdbcType=VARCHAR},
+			</if>
+			<if test="downurl != null">
+				downurl = #{downurl,jdbcType=VARCHAR},
+			</if>
+			<if test="filesize != null">
+				filesize = #{filesize,jdbcType=VARCHAR},
+			</if>
+			<if test="userid != null">
+				userid = #{userid,jdbcType=INTEGER},
+			</if>
+			<if test="fonttags != null">
+				fonttags = #{fonttags,jdbcType=VARCHAR},
+			</if>
+			<if test="fontdesc != null">
+				fontdesc = #{fontdesc,jdbcType=VARCHAR},
+			</if>
+			<if test="fonticon != null">
+				fonticon = #{fonticon,jdbcType=VARCHAR},
+			</if>
+			<if test="fontimg != null">
+				fontimg = #{fontimg,jdbcType=VARCHAR},
+			</if>
+			<if test="createtime != null">
+				createtime = #{createtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatetime != null">
+				updatetime = #{updatetime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="wholerank != null">
+				wholerank = #{wholerank,jdbcType=INTEGER},
+			</if>
+		</set>
+		where fontid = #{fontid,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="font">
+		update t_font
+		set
+		fontname = #{fontname,jdbcType=VARCHAR},
+		downurl =
+		#{downurl,jdbcType=VARCHAR},
+		filesize = #{filesize,jdbcType=VARCHAR},
+		userid = #{userid,jdbcType=INTEGER},
+		fonttags =
+		#{fonttags,jdbcType=VARCHAR},
+		fontdesc = #{fontdesc,jdbcType=VARCHAR},
+		fonticon = #{fonticon,jdbcType=VARCHAR},
+		fontimg =
+		#{fontimg,jdbcType=VARCHAR},
+		createtime =
+		#{createtime,jdbcType=TIMESTAMP},
+		updatetime =
+		#{updatetime,jdbcType=TIMESTAMP},
+		wholerank =
+		#{wholerank,jdbcType=INTEGER}
+		where fontid = #{fontid,jdbcType=INTEGER}
+	</update>
+
+	<sql id="wheres">
+		1=1
+		<if test="fontname !=null and fontname != ''">
+			and f.fontname like
+			CONCAT('%',#{fontname,jdbcType=VARCHAR},'%')
+		</if>
+	</sql>
+
+	<select id="selectByPaging" resultType="font">
+		select u.username,
+		<include refid="Base_Column_List" />
+		from t_font f
+		inner join t_userinfo u on u.userid=f.userid
+		<where>
+			<include refid="wheres" />
+			<if test="orderName != null and orderType != null">
+				order by ${orderName} ${orderType}
+			</if>
+			<if test="start != null and limit != null">
+				limit #{start},#{limit}
+			</if>
+		</where>
+	</select>
+
+	<select id="countByPaging" resultType="int">
+		select
+		count(*)
+		from t_font f
+		inner join t_userinfo u on
+		u.userid=f.userid
+		<where>
+			<include refid="wheres" />
+		</where>
+	</select>
+
+	<select id="getFontExceptUpd" resultType="font" parameterType="java.lang.Integer">
+		select * from t_font
+		where fontid!=#{fontid}
+		order by wholerank asc
+	</select>
+	
+	<select id="getFontCount" resultType="int">
+		select count(*) from t_font
+	</select>
+	
+	<update id="updateOrder" parameterType="font">
+		update t_font
+		set wholerank=#{wholerank}
+		where fontid=#{fontid}
+	</update>
+</mapper>

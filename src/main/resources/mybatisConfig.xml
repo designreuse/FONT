@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="cacheEnabled" value="true" />
+		<setting name="logImpl" value="LOG4J" />
+	</settings>
+	<typeAliases>
+		<!-- 用户 -->
+		<typeAlias alias="userInfo" type="com.acms.entity.TUserInfo"></typeAlias>
+		<typeAlias alias="role" type="com.acms.entity.TRole"></typeAlias>
+		<typeAlias alias="menu" type="com.acms.entity.Menu"></typeAlias>
+		<!-- 字体 -->
+		<typeAlias alias="font" type="com.acms.entity.Font"></typeAlias>
+		<typeAlias alias="recommend" type="com.acms.entity.Recommend"></typeAlias>
+		<typeAlias alias="rotation" type="com.acms.entity.Rotation"></typeAlias>
+	</typeAliases>
+</configuration>
+
+

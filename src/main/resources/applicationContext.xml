@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xmlns:dwra="http://www.directwebremoting.org/schema/spring-dwr-annotations"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring" 
+	xsi:schemaLocation="
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+                http://www.springframework.org/schema/context 
+       			http://www.springframework.org/schema/context/spring-context-2.5.xsd
+       			http://www.directwebremoting.org/schema/spring-dwr http://www.directwebremoting.org/schema/spring-dwr-3.0.xsd
+       			http://www.directwebremoting.org/schema/spring-dwr-annotations http://www.directwebremoting.org/schema/spring-dwr-annotations.xsd
+       			http://www.springframework.org/schema/task
+       			http://www.springframework.org/schema/task/spring-task.xsd
+       			http://www.springframework.org/schema/cache
+       			http://www.springframework.org/schema/cache/spring-cache.xsd
+       			http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
+       			http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+	<context:annotation-config></context:annotation-config>
+	<task:annotation-driven />
+
+	<!-- 将类注解如spring 扫描区间 -->
+	<!-- 多个包名用逗号隔开, 但不能有空格 -->
+	<!-- <context:component-scan base-package="com.snaker.*"></context:component-scan>
+	<context:component-scan base-package="com.snaker.*.*"></context:component-scan> -->
+	
+	<context:component-scan base-package="com.acms.*"></context:component-scan>
+	<context:component-scan base-package="com.acms.*.*"></context:component-scan>
+	<context:component-scan base-package="com.acms.*.*.*"></context:component-scan>
+
+	<!-- 数据库的配置，和网站的一些基本配置 -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+				<value>classpath:vvconf.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!--本示例采用DBCP数据源，应预先把DBCP的jar包复制到工程的lib目录下。数据源配置如下 -->
+	<bean id="dataSourceOracle" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.oracle.driverClassName}" />
+		<property name="url" value="${jdbc.oracle.url}" />
+		<property name="username" value="${jdbc.oracle.username}" />
+		<property name="password" value="${jdbc.oracle.password}" />
+		<!-- 初始化连接数 -->
+		<property name="initialSize" value="1" />
+		<!-- 最大活动连接数 -->
+		<property name="maxActive" value="50" />
+		<!-- 最大空闲连接数 -->
+		<property name="maxIdle" value="5" />
+		<!-- 最小空闲连接数 -->
+		<property name="minIdle" value="15" />
+		<property name="validationQuery" value="select 1" />
+		<property name="testOnBorrow" value="false" />
+		<!-- 定时对线程池中的链接进行validateObject校验 -->
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnReturn" value="false" />
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="60000" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="25200000" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSourceOracle" />
+		<property name="configLocation" value="classpath:mybatisConfig.xml" />
+		<property name="mapperLocations" value="classpath*:com/acms/**/entity/*.xml" />
+	</bean>
+
+	<bean id="sessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" >
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+		<constructor-arg index="1" value="BATCH" />
+	</bean>
+
+	<!-- define the transaction manager -->
+	<bean id="transactionManagerOracle"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSourceOracle" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManagerOracle" />
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+		
+	<!-- 保存图片文件的 -->
+	<bean id="imageUploadHandler" class="com.acms.util.ImageUploadHandler">
+		<property name="location" value="${vv.remote.imagefolder}" />
+	</bean>
+	
+	<!-- 配置redis池，依次为最大实例数，最大空闲实例数，(创建实例时)最大等待时间，(创建实例时)是否验证 -->
+	 
+   <!--  <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="${redis.pool.maxTotal}"/>
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}"/>
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+    </bean> -->
+
+    <!-- <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg index="0" ref="jedisPoolConfig" />
+        <constructor-arg index="1" value="${redis.host}" />
+        <constructor-arg index="2" value="${redis.port}" type="int" />
+        <constructor-arg index="3" value="2000" type="int"/>
+    </bean> -->
+	<!-- <bean id="jedisSentinelPool" class="redis.clients.jedis.JedisSentinelPool">
+		<constructor-arg index="0" value="mymaster" />
+		<constructor-arg index="1">
+			<set>
+				<value>${redis.sentinelpool.host}:${redis.sentinelpool.port}</value>
+				<value>127.0.0.1:36379</value>配置了两个哨兵
+			</set>
+		</constructor-arg>
+		<constructor-arg index="2" ref="jedisPoolConfig" />
+	</bean> -->
+     
+     <bean id="springContextUtil" class="com.acms.util.SpringContextUtil"></bean> 
+</beans>
+         
+         

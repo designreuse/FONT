@@ -1,0 +1,99 @@
+.visual {
+	font: bold 12px "Microsoft YaHei";
+	/* 	margin: 0 auto; */
+	border: solid 3px RGB(47, 64, 80);
+	float: left;
+	width: 100%;
+	text-align: center;
+	/* 	height:750px; */
+	/* 	border-radius:15px; */
+}
+
+.launcher {
+	/* 	width:260px; */
+	margin: 0 auto;
+}
+
+#launchername {
+	margin: 40px 0 0 0;
+	text-align: center;
+	border: 2px dashed gray;
+	width: 268px;
+	height: 40px;
+	color: black;
+	font: bold 15px/40px "Microsoft YaHei";
+}
+
+.launcher-title {
+	width: 268px;
+	margin: 20px auto;
+	height: 40px;
+	border: dashed 2px gray;
+	color: gray;
+	font: bold 15px/40px "Microsoft YaHei";
+}
+
+.launcher-body {
+	width: 268px;
+	margin: 0 auto;
+	background: black;
+}
+
+.launcher-body ul {
+	text-align: center;
+	margin: 0 auto;
+	padding: 0;
+	color: white;
+	width: 248px;
+	overflow :auto;
+}
+
+.launcher-body ul li {
+	float: left;
+	list-style-type: none;
+	padding: 0 1px;
+	padding-top:15px;
+	width: 62px;
+}
+
+.appicon {
+	cursor:pointer;
+	margin:0 auto;
+	width:38px;
+	height:38px;
+	border: dashed 2px white;
+	border-radius:3px
+}
+
+.appicon:hover{
+	background:white;
+	}
+
+.launcher-foot {
+	font-size: 30px;
+}
+
+.launcher-foot img {
+	margin-right: 30px;
+}
+
+.pagenum {
+	margin: 10px 0;
+	color: RGB(43, 204, 134);
+}
+
+.savebtn {
+	margin: 50px;
+	font: bold 15px "Microsoft YaHei";
+}
+
+.savebtn a {
+	display: block;
+	width: 260px;
+	background: url(../../img/acms/images/save.png) no-repeat;
+	background-size: 260px 30px;
+	height: 30px;
+	line-height: 30px;
+	margin: 0 auto;
+	color: white;
+}

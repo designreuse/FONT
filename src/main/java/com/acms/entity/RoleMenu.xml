@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acms.dao.RoleMenuDao" >
+  <resultMap id="BaseResultMap" type="com.acms.entity.RoleMenu" >
+    <id column="rolemenuid" property="rolemenuid" jdbcType="INTEGER" />
+    <result column="roleid" property="roleid" jdbcType="INTEGER" />
+    <result column="menuid" property="menuid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    rolemenuid, roleid, menuid
+  </sql>
+
+	<insert id="insertUniq" parameterType="com.acms.entity.RoleMenu">
+		insert into t_role_menu(roleid,menuid) 
+		select #{roleid},#{menuid} from dual
+		where not exists
+		(select rolemenuid from t_role_menu
+		where roleid=#{roleid} and menuid=#{menuid})
+	</insert>  
+	
+	<delete id="deleteByRoleid" parameterType="int">
+		delete from t_role_menu
+		where roleid=#{roleid}
+	</delete>
+	
+	<delete id="deleteByMenuid" parameterType="int">
+		delete from t_role_menu
+		where menuid=#{menuid}
+	</delete>
+
+	<select id="getMenuListByRole" parameterType="java.lang.Integer"
+		resultType="menu">
+		select m.menuid,m.menuname,m.parentid
+		from t_menu m
+		inner
+		join t_role_menu rm on rm.menuid=m.menuid
+		where m.parentid=#{parentid} and rm.roleid=#{roleid}
+		order by corder asc
+	</select>
+	
+	<select id="getLastNodes" parameterType="java.lang.Integer"
+		resultType="menu">
+		select m.menuid,m.menuname,m.parentid
+		from t_menu m
+		inner
+		join t_role_menu rm on rm.menuid=m.menuid
+		where rm.roleid=#{roleid} and m.menuid not in (select parentid from t_menu)
+		order by corder asc
+	</select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_role_menu
+    where rolemenuid = #{rolemenuid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_role_menu
+    where rolemenuid = #{rolemenuid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.acms.entity.RoleMenu" >
+    insert into t_role_menu (rolemenuid, roleid, menuid
+      )
+    values (#{rolemenuid,jdbcType=INTEGER}, #{roleid,jdbcType=INTEGER}, #{menuid,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.acms.entity.RoleMenu" >
+    insert into t_role_menu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="rolemenuid != null" >
+        rolemenuid,
+      </if>
+      <if test="roleid != null" >
+        roleid,
+      </if>
+      <if test="menuid != null" >
+        menuid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="rolemenuid != null" >
+        #{rolemenuid,jdbcType=INTEGER},
+      </if>
+      <if test="roleid != null" >
+        #{roleid,jdbcType=INTEGER},
+      </if>
+      <if test="menuid != null" >
+        #{menuid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.acms.entity.RoleMenu" >
+    update t_role_menu
+    <set >
+      <if test="roleid != null" >
+        roleid = #{roleid,jdbcType=INTEGER},
+      </if>
+      <if test="menuid != null" >
+        menuid = #{menuid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where rolemenuid = #{rolemenuid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.acms.entity.RoleMenu" >
+    update t_role_menu
+    set roleid = #{roleid,jdbcType=INTEGER},
+      menuid = #{menuid,jdbcType=INTEGER}
+    where rolemenuid = #{rolemenuid,jdbcType=INTEGER}
+  </update>
+</mapper>

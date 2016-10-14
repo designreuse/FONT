@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acms.dao.RoleDao">
+
+	<sql id="wheres">
+		1=1 and state=1
+	</sql>
+
+	<select id="selectByPaging" resultType="role">
+	select r.roleid,r.rolename,r.adddate,r.state,u.username
+	from t_role r
+	inner join t_userinfo u on u.userid=r.creatorid
+	<if test="orderName != null and orderType != null">
+		order by ${orderName} ${orderType}
+	</if>
+	<if test="start != null and limit != null">
+		limit #{start},#{limit}
+	</if>
+	</select>
+	
+	<select id="countByPaging" resultType="int">
+		select count(*) from t_role
+	</select>
+
+	<select id="selectRoleCount" resultType="int">
+		select count(*) from t_role
+		where rolename=#{rolename}
+	</select>
+	
+	<insert id="add" parameterType="role">
+		insert into t_role (rolename,creatorid,adddate,state)
+		values(#{rolename},#{creatorid},#{adddate},#{state})
+	</insert>
+	
+	<select id="select" parameterType="role" resultType="role">
+		<![CDATA[
+		select * from t_role where 1 = 1 and rolename=#{rolename}
+		   ]]>
+	</select>
+	
+	<select id="select1" parameterType="int" resultType="role">
+		select ROLEID,ROLENAME,CREATORID,ADDDATE,STATE from t_role where 1 = 1 and roleid=#{roleid}
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+		delete from t_role
+		 where roleid=#{roleid}
+		 ]]>
+	</delete>
+	
+	<update id="update" parameterType="role">
+		update t_role set
+		rolename=#{rolename},state=#{state}
+		where roleid=#{roleid}
+	</update>
+
+
+
+
+	<select id="selectList" parameterType="role" resultType="role">
+		<![CDATA[
+		select ROLEID,ROLENAME from t_role
+		]]>
+		<![CDATA[ order by ROLEID asc ]]>
+	</select>
+
+	<select id="selectPage" parameterType="Map" resultType="role">
+		<![CDATA[
+		 select *
+		   from (select t.*, rownum rn
+		           from (select * from T_ROLE trole
+		    ]]>
+		<if test="userid != 0 "></if>    
+		    <![CDATA[ 
+			left join (select urole.ROLEID uroleid
+                 from R_USERROLE urole
+                where urole.userid = #{obj.userid}) userrole
+          		on trole.roleid = userrole.uroleid
+            where userrole.uroleid is null 
+	   		]]>
+		<![CDATA[
+		 order by roleid desc) t
+		          where rownum <= ${limit})
+		  where rn > ${start}
+		    ]]>
+	</select>
+
+	<select id="countPageSize" parameterType="role" resultType="int">
+		<![CDATA[
+		select count(roleid) from T_ROLE trole left join (select urole.ROLEID uroleid
+                 from R_USERROLE urole
+                where urole.userid = #{obj.userid}) userrole
+          		on trole.roleid = userrole.uroleid
+            where userrole.uroleid is null 
+		    ]]>
+	</select>
+
+	<insert id="add1" parameterType="role" keyProperty="roleid">
+		<selectKey resultType="long" keyProperty="roleid" order="BEFORE">
+			select SEQ_T_ROLE_ROLEID.nextVal as roleid from dual
+		</selectKey>
+		<![CDATA[
+		insert into T_ROLE(ROLEID,ROLENAME,CREATORID,ADDDATE,STATE) values 
+		(#{roleid},#{rolename,jdbcType=VARCHAR},#{creatorid},SYSDATE,#{state})
+		   ]]>
+	</insert>
+
+	<select id="selectRoleTree" parameterType="role" resultType="role">
+		<![CDATA[
+		   SELECT TC.COMPANYID, TR.ROLEID, max(TR.ROLENAME) as ROLENAME
+			  FROM T_COMPANY TC
+			  LEFT JOIN T_USERDETAIL TU
+			    ON TC.COMPANYID = TU.COMPANYID
+			  LEFT JOIN T_USERLOGIN TL
+			    ON TU.USERID = TL.USERID
+			  LEFT JOIN R_USERROLE RU
+			    ON TU.USERID = RU.USERID
+			  LEFT JOIN T_ROLE TR
+			    ON RU.ROLEID = TR.ROLEID
+			 WHERE TC.STATE = TL.STATE
+			   AND TC.ISDEL = TU.ISDEL
+			   AND TL.STATE = TU.STATE
+			   AND TU.STATE = TR.STATE
+			   AND TU.ISDEL = 2
+			   AND TC.COMPANYTYPE = 1			
+		   ]]>
+		<if test="state != 0"><![CDATA[ AND TR.STATE=#{state} ]]></if>
+		   <![CDATA[
+		     GROUP BY TC.COMPANYID, TR.ROLEID
+			 ]]>
+	</select>
+</mapper>

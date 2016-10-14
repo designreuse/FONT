@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acms.dao.RecommendDao">
+	<resultMap id="BaseResultMap" type="recommend">
+		<id column="recommendid" property="recommendid" jdbcType="INTEGER" />
+		<result column="fontid" property="fontid" jdbcType="INTEGER" />
+		<result column="recommendtype" property="recommendtype"
+			jdbcType="INTEGER" />
+		<result column="rank" property="rank" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		recommendid, fontid, recommendtype, rank
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from t_recommend
+		where recommendid = #{recommendid,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_recommend
+		where recommendid = #{recommendid,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="recommend">
+		insert into t_recommend (recommendid, fontid, recommendtype,
+		rank)
+		values (#{recommendid,jdbcType=INTEGER}, #{fontid,jdbcType=INTEGER},
+		#{recommendtype,jdbcType=INTEGER},
+		#{rank,jdbcType=INTEGER})
+	</insert>
+	<insert id="insertSelective" parameterType="recommend">
+		insert into t_recommend
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="recommendid != null">
+				recommendid,
+			</if>
+			<if test="fontid != null">
+				fontid,
+			</if>
+			<if test="recommendtype != null">
+				recommendtype,
+			</if>
+			<if test="rank != null">
+				rank,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="recommendid != null">
+				#{recommendid,jdbcType=INTEGER},
+			</if>
+			<if test="fontid != null">
+				#{fontid,jdbcType=INTEGER},
+			</if>
+			<if test="recommendtype != null">
+				#{recommendtype,jdbcType=INTEGER},
+			</if>
+			<if test="rank != null">
+				#{rank,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="recommend">
+		update t_recommend
+		<set>
+			<if test="fontid != null">
+				fontid = #{fontid,jdbcType=INTEGER},
+			</if>
+			<if test="recommendtype != null">
+				recommendtype = #{recommendtype,jdbcType=INTEGER},
+			</if>
+			<if test="rank != null">
+				rank = #{rank,jdbcType=INTEGER},
+			</if>
+		</set>
+		where recommendid = #{recommendid,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="recommend">
+		update t_recommend
+		set fontid = #{fontid,jdbcType=INTEGER},
+		recommendtype = #{recommendtype,jdbcType=INTEGER},
+		rank = #{rank,jdbcType=INTEGER}
+		where recommendid = #{recommendid,jdbcType=INTEGER}
+	</update>
+	
+	<sql id="wheres">
+		1=1
+		<if test="fontname !=null and fontname !=''">
+			and fontname like
+			CONCAT('%',#{fontname,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="recommendtype !=null">
+			and recommendtype = #{recommendtype}
+		</if>
+	</sql>
+	
+	<select id="selectByPaging" resultType="recommend">
+		select r.*,f.fontname
+		from t_recommend r
+		left join t_font f on f.fontid=r.fontid
+		<where>
+			<include refid="wheres" />
+			<if test="orderName != null and orderType != null">
+				order by ${orderName} ${orderType}
+			</if>
+			<if test="start != null and limit != null">
+				limit #{start},#{limit}
+			</if>
+		</where>
+	</select>
+	
+	<select id="countByPaging" resultType="int">
+		select count(*)
+		from t_recommend r
+		left join t_font f on f.fontid=r.fontid
+		<where>
+			<include refid="wheres" />
+		</where>
+	</select>
+	
+	<select id="selectFontByPaging" resultType="font">
+		select * from t_font
+		<where>
+			<include refid="wheres" />
+			and fontid not in (select fontid from t_recommend)
+			<if test="orderName != null and orderType != null">
+				order by ${orderName} ${orderType}
+			</if>
+			<if test="start != null and limit != null">
+				limit #{start},#{limit}
+			</if>
+		</where>
+	</select>
+	
+	<select id="countFontByPaging" resultType="int">
+		select count(*) from t_font
+		<where>
+			<include refid="wheres" />
+			and fontid not in (select fontid from t_recommend)
+		</where>
+	</select>
+	
+	<select id="getRecommendCount" parameterType="recommend" resultType="int">
+		select count(*) from t_recommend
+		<where>
+			recommendtype=#{recommendtype}
+		</where>
+	</select>
+	
+	<select id="getRecommendExceptUpd" resultType="recommend" parameterType="recommend">
+		select * from t_recommend
+		where recommendid!=#{recommendid}
+		and recommendtype=#{recommendtype}
+		order by rank asc
+	</select>
+	
+	<update id="updateOrder" parameterType="recommend">
+		update t_recommend
+		set rank=#{rank}
+		where recommendid=#{recommendid}
+	</update>
+	
+	<select id="countByFontid" parameterType="java.lang.Integer" resultType="int">
+		select count(*) from t_recommend
+		where fontid=#{fontid}
+	</select>
+	
+	<select id="selectByFontid" parameterType="java.lang.Integer" resultType="recommend">
+		select * from t_recommend
+		where fontid=#{fontid}
+	</select>
+</mapper>

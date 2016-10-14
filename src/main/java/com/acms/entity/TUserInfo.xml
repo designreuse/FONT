@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acms.dao.UserInfoDao">
+
+	<resultMap type="userInfo" id="userInfoResultMap">
+
+		<result property="userid" column="USERID" />
+		<result property="username" column="USERNAME" />
+		<result property="nikename" column="NIKENAME" />
+		<result property="usericon" column="USERICON" />
+		<result property="state" column="STATE" />
+		<result property="auditstate" column="AUDITSTATE" />
+
+<!-- 		<association property="userSecurity" javaType="com.acms.entity.TUsersecurity">
+			<id property="userid" column="USERID" />
+			<result property="userid" column="USERID" />
+			<result property="password" column="PASSWORD" />
+			<result property="pwdquestion" column="PWDQUESTION" />
+			<result property="pwdanswer" column="PWDANSWER" />
+		</association> -->
+	</resultMap>
+
+	<select id="login" parameterType="userInfo" resultType="userInfo">
+		<![CDATA[
+		select userInfo.USERID,
+		   userInfo.USERNAME,
+		   userInfo.NIKENAME,
+		   userInfo.USERICON,
+		   userInfo.LOGINTIME,
+		   userInfo.LASTLOGINTIME,
+		   userInfo.LOGINIP,
+		   userInfo.LASTLOGINIP,
+		   userInfo.STATE,
+		   userInfo.CREATORID,
+		   userInfo.ADDDATE,
+		   userInfo.password,
+		   userInfo.usertype,
+		   userInfo.logintimes,
+		   userInfo.roleid
+		   from t_userinfo userInfo
+		   where userInfo.username = #{username}
+		   and userInfo.password = #{password}
+		   and userInfo.state = 1
+		   ]]>
+	</select>
+
+	<select id="selectByPaging" resultType="userInfo">
+		select userInfo.USERID,
+		userInfo.USERNAME,
+		userInfo.NIKENAME,
+		userInfo.USERICON,
+		userInfo.LOGINTIME,
+		userInfo.LASTLOGINTIME,
+		userInfo.LOGINIP,
+		userInfo.LASTLOGINIP,
+		userInfo.STATE,
+		userInfo.CREATORID,
+		userInfo.ADDDATE,
+		userInfo.password,
+		userInfo.usertype,
+		userInfo.logintimes,
+		userInfo.roleid,r.rolename from t_userinfo userInfo
+		inner join t_role r on r.roleid
+		= userInfo.roleid
+		<where>
+			<if test="roleid !=null and roleid !=''">
+				and userInfo.roleid=#{roleid,jdbcType=INTEGER}
+			</if>
+			and (username like CONCAT('%',#{name,jdbcType=VARCHAR},'%') or
+			nikename
+			like CONCAT('%',#{name,jdbcType=VARCHAR},'%'))
+			<if test="orderName != null and orderType != null">
+				order by ${orderName} ${orderType}
+			</if>
+			<if test="start != null and limit != null">
+				limit #{start},#{limit}
+			</if>
+		</where>
+	</select>
+
+	<select id="countByPaging" resultType="int">
+		select
+		count(*)
+		from t_userinfo
+		<where>
+			<if test="roleid !=null and roleid !=''">
+				and roleid=#{roleid,jdbcType=INTEGER}
+			</if>
+			and (username like CONCAT('%',#{name,jdbcType=VARCHAR},'%') or
+			nikename
+			like CONCAT('%',#{name,jdbcType=VARCHAR},'%'))
+		</where>
+	</select>
+
+	<select id="getUsernameCount" parameterType="java.lang.String"
+		resultType="int">
+		select count(*) from t_userinfo
+		where
+		username=#{username,jdbcType=VARCHAR}
+	</select>
+
+	<insert id="add" parameterType="userInfo">
+		insert into t_userinfo
+		(username,
+		nikename, usericon, state, creatorid, adddate, password, usertype,
+		roleid, logintimes)
+		values
+		(#{username,jdbcType=VARCHAR},
+		#{nikename,jdbcType=VARCHAR},
+		#{usericon,jdbcType=VARCHAR},
+		#{state,jdbcType=INTEGER},
+		#{creatorid,jdbcType=INTEGER},
+		#{adddate},
+		#{password,jdbcType=VARCHAR},
+		#{usertype,jdbcType=INTEGER},
+		#{roleid,jdbcType=INTEGER},
+		#{logintimes,jdbcType=INTEGER}
+		)
+	</insert>
+
+	<delete id="delete" parameterType="java.lang.Integer">
+		<![CDATA[
+		delete from t_userinfo
+		 where  userid = #{userid}
+		 ]]>
+	</delete>
+	
+	<delete id="deleteByRoleid" parameterType="java.lang.Integer">
+		delete from t_userinfo
+		where  roleid = #{roleid}
+	</delete>
+
+	<select id="checkOldpwd" parameterType="userInfo" resultType="int">
+		select count(*) from t_userinfo
+		where username = #{username}
+		and
+		password = #{password}
+	</select>
+
+	<update id="submitNewpwd" parameterType="userInfo">
+		update
+		t_userinfo
+		set
+		password = #{password}
+		where username=#{username}
+	</update>
+
+	<select id="select" parameterType="userInfo" resultMap="userInfoResultMap">
+		<![CDATA[
+		select userInfo.USERID,
+		   userInfo.USERNAME,
+		   userInfo.NIKENAME,
+		   userInfo.USERICON,
+		   userInfo.LOGINDATE,
+		   userInfo.LASTLOGINDATE,
+		   userInfo.LOGINIP,
+		   userInfo.STATE,
+		   userInfo.CREATORID,
+		   userInfo.ADDDATE,
+		   userInfo.AUDITSTATE,
+		   userSecurity.USERID,
+		   userSecurity.password,
+		   userSecurity.pwdquestion,
+		   userSecurity.pwdanswer
+		   from T_userInfo userInfo,T_USERSECURITY userSecurity 
+		   where userInfo.USERID =  userSecurity.USERID
+		   and userInfo.USERID = #{userid}
+		   ]]>
+	</select>
+
+	<select id="selectByUserName" parameterType="userInfo"
+		resultType="userInfo">
+		<![CDATA[
+		select USERID,
+		   USERNAME
+		   from T_userInfo
+		   where USERNAME = #{username}
+		   ]]>
+	</select>
+
+	<select id="selectListByMap" parameterType="Map" resultType="userInfo">
+		<![CDATA[
+		select userInfo.USERID,userInfo.USERNAME from T_userInfo userInfo left outer join t_userdetail userdetail on userInfo.userid=userdetail.userid where 1=1
+		   ]]>
+		<if test="companyid != null and companyid != '' "><![CDATA[ and userdetail.companyid = #{companyid} ]]></if>
+	</select>
+
+	<select id="selectList" parameterType="userInfo" resultType="userInfo">
+		<![CDATA[
+		select * from T_userInfo tuser 
+			left join T_USERDETAIL userd
+			on tuser.userid = userd.userid
+		   ]]>
+		<where>
+			<if test="companyid != null and companyid != '' "><![CDATA[ userd.companyid = #{companyid} ]]></if>
+		</where>
+	</select>
+
+	<select id="selectPage" parameterType="Map" resultType="userInfo">
+		<![CDATA[
+		 select *
+		   from (select t.*, rownum rn
+		           from (select tuser.*,
+			       comp.companyname,
+			       dep.departmentname
+			  from T_userInfo tuser
+			  left join T_USERDETAIL userD
+			    on tuser.userid = userD.userid
+			  left join T_COMPANY comp
+			    on userD.companyid = comp.companyid
+			  left join (select t.*
+			               from (select a.*,
+			                            row_number() over(partition by userid order by ucid desc) as rn
+			                       from R_USERDEPARTMENT a) t
+			              where t.rn = 1) userDep
+			    on tuser.userid = userDep.userid
+			  left join T_DEPARTMENT dep
+			    on userDep.Departmentid = dep.departmentid
+			    where 1=1
+		    ]]>
+		<if test="obj.usertype == 0"></if>
+		<if test="obj.usertype == -1"><![CDATA[ and userD.usertype = -1 ]]></if>
+		<if test="obj.usertype > 0"><![CDATA[ and userD.usertype = #{obj.usertype} ]]></if>
+		<if test="obj.username != null and obj.username != '' "><![CDATA[ and (tuser.username like '%${obj.username}%' or tuser.nikename like '%${obj.username}%' )]]></if>
+		<![CDATA[
+			order by tuser.userid desc) t
+		          where rownum <= ${limit})
+		  where rn > ${start}
+		 ]]>
+	</select>
+
+	<select id="countPageSize" parameterType="Map" resultType="int">
+		<![CDATA[
+		select count(*)
+			  from T_userInfo tuser
+			  left join T_USERDETAIL userD
+			    on tuser.userid = userD.userid
+			  left join T_COMPANY comp
+			    on userD.companyid = comp.companyid
+			  left join (select t.*
+			               from (select a.*,
+			                            row_number() over(partition by userid order by ucid desc) as rn
+			                       from R_USERDEPARTMENT a) t
+			              where t.rn = 1) userDep
+			    on tuser.userid = userDep.userid
+			  left join T_DEPARTMENT dep
+			    on userDep.Departmentid = dep.departmentid
+			    where 1=1
+		    ]]>
+		<if test="obj.usertype == 0"></if>
+		<if test="obj.usertype == -1"><![CDATA[ and userD.usertype = -1 ]]></if>
+		<if test="obj.usertype > 0"><![CDATA[ and userD.usertype = #{obj.usertype} ]]></if>
+		<if test="obj.username != null and obj.username != '' "><![CDATA[ and (tuser.username like '%${obj.username}%' or tuser.nikename like '%${obj.username}%' )]]></if>
+	</select>
+
+	<update id="update" parameterType="userInfo">
+		<![CDATA[
+		update t_userinfo
+		 ]]>
+		<set>
+			<if test="password != null and password != ''"><![CDATA[ password = #{password}, ]]></if>
+			<if test="nikename != null and nikename != ''"><![CDATA[ NIKENAME = #{nikename}, ]]></if>
+			<if test="usericon != null and usericon != ''"><![CDATA[ USERICON=#{usericon}, ]]></if>
+			<if test="logintime != null"><![CDATA[ LOGINTIME=#{logintime}, ]]></if>
+			<if test="lastlogintime != null"><![CDATA[ LASTLOGINTIME=#{lastlogintime}, ]]></if>
+			<if test="loginip != null"><![CDATA[ LOGINIP=#{loginip}, ]]></if>
+			<if test="lastloginip != null"><![CDATA[ LASTLOGINIP=#{lastloginip}, ]]></if>
+			STATE = #{state},
+			<if test="logintimes != null"><![CDATA[ logintimes=#{logintimes}, ]]></if>
+			<if test="roleid != 0"><![CDATA[roleid = #{roleid} ]]></if>
+		</set>
+		 <![CDATA[where USERID = #{userid}]]>
+	</update>
+	<select id="selectBySelective" parameterType="userInfo" resultType="userInfo">
+		select * from t_userinfo
+		<where>
+			1=1
+			<if test="userid != null">
+				and userid = #{userid,jdbcType=INTEGER}
+			</if>
+			<if test="username != null">
+				and username = #{username,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+</mapper>
